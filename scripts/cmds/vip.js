@@ -19,34 +19,52 @@ module.exports = {
   config: {
     name: "vip",
     aliases: ["vipstatus"],
-    version: "1.0",
+    version: "1.3",
     author: "Ꮠ ᎯᏞᎠᏋᎡᎥᏣ-シ︎︎",
     countDown: 10,
     role: 0,
-    shortDescription: "Buy VIP status for special privileges!",
+    shortDescription: "Buy or check your VIP status!",
     longDescription:
-      "Users can buy VIP status, which grants special benefits like reduced cooldowns, higher chances of winning games, and more.",
+      "Users can buy a VIP pass for 3 days or check their current VIP privileges.",
     category: "economy",
-    guide: "{pn} <duration_in_days> <price>",
+    guide: "{pn} to check VIP status or just {pn} to buy VIP for 1M spina.",
   },
 
   onStart: async function ({ args, message, usersData, event }) {
-    const duration = parseInt(args[0]);
-    const price = parseInt(args[1]);
     const userID = event.senderID;
 
-    if (!duration || duration <= 0) {
-      return message.reply("❌ | Please specify a valid duration in days.");
+    if (args.length === 0) {
+      // Check the user's current privileges
+      const privileges = checkPrivileges(userID);
+      if (privileges.length === 0) {
+        return message.reply(
+          "💔 Oops! No VIP privileges detected! 💔\n\n" +
+          "🌟 Want to shine brighter than the rest? Get your *VIP Pass* now for **1,000,000 spina** and enjoy exclusive perks for the next **3 days**! 🎉\n" +
+          "💰 Simply type `~vip` to unlock the ultimate experience! \n\n" +
+          "✨ Don't miss out on the fun—become a VIP today! ✨"
+        );
+      }
+
+      const vipStatus = privileges
+        .map(
+          (priv) =>
+            `✨ *Privilege:* ${priv.name}\n📅 *Expires At:* ${new Date(
+              priv.expiresAt
+            ).toLocaleString()}`
+        )
+        .join("\n\n");
+
+      return message.reply(
+        `💎 *Your Active VIP Privileges:* 💎\n\n${vipStatus}`
+      );
     }
 
-    if (!price || price <= 0) {
-      return message.reply("❌ | Please specify a valid price in spina.");
-    }
+    const price = 1000000; // Fixed price of 1,000,000 spina for the VIP pass
 
     const userData = await usersData.get(userID);
     if (userData.money < price) {
       return message.reply(
-        "💸 | You don't have enough spina to buy VIP status!"
+        "💸 | You don't have enough spina to buy the VIP pass!"
       );
     }
 
@@ -65,7 +83,7 @@ module.exports = {
     }
 
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + duration);
+    expiresAt.setDate(expiresAt.getDate() + 3); // Fixed 3-day duration
 
     data[userID].privileges.push({
       name: "vip",
@@ -75,7 +93,7 @@ module.exports = {
     fs.writeFileSync(path, JSON.stringify(data, null, 2), "utf-8");
 
     message.reply(
-      `✨💎 *VIP Status Activated!* 💎✨\n\n🎟 You are now a VIP for **${duration} days**! 🎉\n💰 Remaining balance: **${userData.money} spina**\n\nEnjoy your special privileges! 🌟`
+      `✨💎 *VIP Pass Activated!* 💎✨\n\n🎟 You are now a VIP for the next **3 days**! 🎉\n💰 Remaining balance: **${userData.money} spina**\n\nEnjoy your special privileges! 🌟`
     );
   },
 };
