@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = './bank.json'; // Chemin vers ton fichier JSON
+
 module.exports = {
   config: {
     name: "bank",
@@ -12,13 +15,26 @@ module.exports = {
     guide: "{pn} loan <amount> / {pn} repay <amount>",
   },
 
-  onStart: async function ({ args, message, usersData, event }) {
-    const userData = await usersData.get(event.senderID);
+  onStart: async function ({ args, message, event }) {
+    // Charger les données du fichier bank.json
+    let bankData = {};
+    if (fs.existsSync(path)) {
+      const data = fs.readFileSync(path);
+      bankData = JSON.parse(data);
+    }
+
+    const userID = event.senderID;
     const action = args[0]?.toLowerCase();
     const amount = parseInt(args[1]);
 
+    // Si l'utilisateur n'a pas encore de prêt dans le fichier, on l'initialise
+    if (!bankData[userID]) {
+      bankData[userID] = { loan: null, money: 1000 }; // Solde initial (exemple)
+    }
+
+    const userData = bankData[userID];
+
     if (action === "loan") {
-      // Calculer le montant maximal qu'un joueur peut prêter (40% de leur solde actuel)
       const maxLoanAmount = Math.floor(userData.money * 0.40); // 40% de la balance
 
       if (!amount || amount <= 0) {
@@ -35,7 +51,6 @@ module.exports = {
         return message.reply("💸 | You don't have enough spina to take this loan.");
       }
 
-      // Appliquer un taux d'intérêt de 15% sur le prêt
       const loanData = {
         amount: amount,
         interestRate: 0.15,
@@ -43,10 +58,9 @@ module.exports = {
         repaid: 0,
       };
 
-      // Enregistrer les données du prêt dans l'utilisateur
       userData.loan = loanData;
       userData.money -= amount; // Déduire l'argent du joueur
-      await usersData.set(event.senderID, userData);
+      fs.writeFileSync(path, JSON.stringify(bankData, null, 2)); // Sauvegarder les données
 
       message.reply(
         `💰 *Loan Approved!* 💰\n\n` +
@@ -54,7 +68,6 @@ module.exports = {
         `Your loan repayment is due within 2 days. The total amount to repay is **${(amount * 1.15).toFixed(2)}** spina. 🕑`
       );
     } else if (action === "repay") {
-      // Vérifier si l'utilisateur a un prêt à rembourser
       const loanData = userData.loan;
 
       if (!loanData || loanData.amount <= 0) {
@@ -65,8 +78,8 @@ module.exports = {
         return message.reply("❌ | Please specify a valid repayment amount.");
       }
 
-      const totalRepayment = loanData.amount * (1 + loanData.interestRate); // Montant total à rembourser avec intérêts
-      const remainingAmount = totalRepayment - loanData.repaid; // Montant restant à rembourser
+      const totalRepayment = loanData.amount * (1 + loanData.interestRate);
+      const remainingAmount = totalRepayment - loanData.repaid;
 
       if (amount > remainingAmount) {
         return message.reply(
@@ -78,18 +91,16 @@ module.exports = {
         return message.reply("💸 | You don't have enough spina to make this repayment.");
       }
 
-      // Mettre à jour les informations du prêt
       loanData.repaid += amount;
       userData.money -= amount; // Déduire le remboursement du solde du joueur
-      await usersData.set(event.senderID, userData);
+      fs.writeFileSync(path, JSON.stringify(bankData, null, 2)); // Sauvegarder les données
 
       const currentTime = Date.now();
-      const timeElapsed = currentTime - loanData.timestamp; // Calculer le temps écoulé depuis la demande de prêt
-      const loanDueDate = 86400000 * 2; // 2 jours en millisecondes
+      const timeElapsed = currentTime - loanData.timestamp;
+      const loanDueDate = 86400000 * 2;
 
       if (timeElapsed > loanDueDate) {
-        // Si le délai est dépassé, appliquer une pénalité
-        const penalty = loanData.amount * 0.10; // 10% de pénalité
+        const penalty = loanData.amount * 0.10;
         loanData.amount += penalty;
         message.reply(
           `⚠️ *Penalty Applied!* ⚠️\n\n` +
@@ -97,10 +108,9 @@ module.exports = {
         );
       }
 
-      // Si le joueur a remboursé la totalité du prêt
       if (loanData.repaid >= totalRepayment) {
-        delete userData.loan; // Supprimer les données du prêt
-        await usersData.set(event.senderID, userData);
+        delete userData.loan;
+        fs.writeFileSync(path, JSON.stringify(bankData, null, 2)); // Sauvegarder les données
         return message.reply(
           `🎉 *Loan Fully Repaid!* 🎉\n\n` +
           `You have successfully repaid your loan of **${loanData.amount}** spina (including interest)! 💸\n` +
