@@ -6,7 +6,7 @@ module.exports = {
 
   config: {
 
-    name: "quiz",
+    name: "...",
 
     aliases: [],
 
