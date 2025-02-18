@@ -1,4 +1,4 @@
-const axios = require("axios");
+~cmd install cornelia.js const axios = require("axios");
 module.exports = {
 	config: {
 		name: 'cornelia',
@@ -40,7 +40,7 @@ module.exports = {
 	onStart: async function ({ args, threadsData, message, event, getLang }) {
 		const allowedGroupId = "6449429501820415"; // L'ID autorisé
 		if (event.threadID !== allowedGroupId) {
-			return message.reply("Cette commande n'est pas autorisée dans ce groupe !");
+			return message.reply("Accès exclusif 🍂 ! Mais , pour toi je peut faire une exception 😉✨. Tape simplement la cmd « ~corneliagc » 📝 pour rejoindre ma communauté 👥 et pour discuter avec moi au temps de fois que tu le veux. Merci💓 !!!");
 		}
 
 		if (args[0] === 'parle' || args[0] === 'tgl') {
@@ -88,4 +88,4 @@ async function getMessage(yourMessage, langCode) {
 		throw new Error(res.data.success);
 
 	return res.data.message;
-        }
+}
