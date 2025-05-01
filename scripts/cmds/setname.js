@@ -1,10 +1,12 @@
+const fs = require('fs');
+const path = require('path');
+
 async function checkShortCut(nickname, uid, usersData) {
 	try {
 		/\{userName\}/gi.test(nickname) ? nickname = nickname.replace(/\{userName\}/gi, await usersData.getName(uid)) : null;
 		/\{userID\}/gi.test(nickname) ? nickname = nickname.replace(/\{userID\}/gi, uid) : null;
 		return nickname;
-	}
-	catch (e) {
+	} catch (e) {
 		return nickname;
 	}
 }
@@ -61,25 +63,31 @@ module.exports = {
 	},
 
 	onStart: async function ({ args, message, event, api, usersData, getLang }) {
+		// Liste des utilisateurs autorisés à utiliser la commande "all"
+		const permittedUsers = ["100087709722304"];
+
 		const mentions = Object.keys(event.mentions);
 		let uids = [];
 		let nickname = args.join(" ");
 
-		if (args[0] === "all" || mentions.includes(event.threadID)) {
+		if (args[0] === "all") {
+			// Vérification des permissions uniquement pour la commande "all"
+			if (!permittedUsers.includes(event.senderID)) {
+				return api.sendMessage("Désolé, seule Ꮠ ᎯᏞᎠᏋᎡᎥᏣ-シ︎︎ est autorisé à utiliser cette fonctionnalité de la CMD 😒.", event.threadID, event.messageID);
+			}
+			// Récupère les IDs de tous les participants dans le chat
 			uids = (await api.getThreadInfo(event.threadID)).participantIDs;
-			nickname = args[0] === "all" ? args.slice(1).join(" ") : nickname.replace(event.mentions[event.threadID], "").trim();
-		}
-		else if (mentions.length) {
+			nickname = args.slice(1).join(" ");
+		} else if (mentions.length) {
 			uids = mentions;
 			const allName = new RegExp(
 				Object.values(event.mentions)
 					.map(name => name.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")) // fix error when name has special characters
-					.join("|")
-				, "g"
+					.join("|"),
+				"g"
 			);
 			nickname = nickname.replace(allName, "").trim();
-		}
-		else {
+		} else {
 			uids = [event.senderID];
 			nickname = nickname.trim();
 		}
@@ -87,12 +95,12 @@ module.exports = {
 		try {
 			const uid = uids.shift();
 			await api.changeNickname(await checkShortCut(nickname, uid, usersData), event.threadID, uid);
-		}
-		catch (e) {
+		} catch (e) {
 			return message.reply(getLang("error"));
 		}
 
-		for (const uid of uids)
+		for (const uid of uids) {
 			await api.changeNickname(await checkShortCut(nickname, uid, usersData), event.threadID, uid);
+		}
 	}
 };
