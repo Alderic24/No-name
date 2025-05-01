@@ -1,7 +1,24 @@
 const axios = require('axios');
 
-const apiKey = "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"; // API Key Groq
-const url = "https://api.groq.com/openai/v1/chat/completions"; // Groq API endpoint
+const apiKey = "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";
+const url = "https://api.groq.com/openai/v1/chat/completions";
+
+// Fonction pour convertir du texte en style monospace
+function toMonospace(text) {
+    const offsetUpper = 0x1D670 - 65;
+    const offsetLower = 0x1D68A - 97;
+
+    return [...text].map(char => {
+        const code = char.charCodeAt(0);
+        if (code >= 65 && code <= 90) {
+            return String.fromCodePoint(code + offsetUpper);
+        } else if (code >= 97 && code <= 122) {
+            return String.fromCodePoint(code + offsetLower);
+        } else {
+            return char;
+        }
+    }).join('');
+}
 
 async function getAIResponse(input, messageID) {
     try {
@@ -45,10 +62,11 @@ module.exports = {
         if (keywords.includes(input.toLowerCase())) {
             const userInfo = await api.getUserInfo(event.senderID);
             const username = userInfo[event.senderID]?.name || "utilisateur";
+            const styledName = toMonospace(username);
 
             response =
                 `⤷ ૮₍｡• ᵕ •｡₎ა  ꒰⋆｡ᵕ ꈊ ᵕ｡꒱ \n`+
-                `𝙷𝚒𝚒 ${username}~! 𝙸'𝚖 𝙲𝚘𝚛𝚗𝚎𝚕𝚒𝚊-𝚌𝚑𝚊𝚗!!\n`+
+                `𝙷𝚒𝚒 ${styledName}~! 𝙸'𝚖 𝙲𝚘𝚛𝚗𝚎𝚕𝚒𝚊-𝚌𝚑𝚊𝚗!!\n`+
                 `𝙰𝚜𝚔 𝚖𝚎 𝚊𝚗𝚢𝚝𝚑𝚒𝚗𝚐 𝚗𝚢𝚊~ ✏️\n`+
                 `˚₊· ͟͟͞͞➳❥ 𝑾𝒊𝒕𝒉 𝒍𝒐𝒗𝒆, 𝑪𝒐𝒓𝒏𝒆𝒍𝒊𝒂\n`+
                 `━━━━━✿━━━━━`;
@@ -58,7 +76,7 @@ module.exports = {
                 `✦ ♡༶ᏟᎾᎡᏁᎬᏞᎥᎯ༶♡『⛧』❖\n`+
                 `              ૮₍｡• ˕ •｡₎ა\n`+
                 `╭━━━━⊹⊱✹⊰⊹━━━━╮\n`+
-                `˚₊· ͟͟͞͞➳❥ | ${aiResponse.response}\n`+
+                `˚₊· ͟͟͞͞➳❥ | ${toMonospace(aiResponse.response)}\n`+
                 `╰━━━━⊹⊱✹⊰⊹━━━━╯\n`+
                 `🦋✨ 𝒜𝓃𝓈𝓌𝑒𝓇 𝓌𝒾𝓉𝒽 𝓁𝒾𝑔𝒽𝓉... ⛩️`;
         }
@@ -77,10 +95,11 @@ module.exports = {
         if (lower === matchedTrigger) {
             const userInfo = await api.getUserInfo(event.senderID);
             const username = userInfo[event.senderID]?.name || "utilisateur";
+            const styledName = toMonospace(username);
 
             response =
                 `⤷ ૮₍｡• ᵕ •｡₎ა  ꒰⋆｡ᵕ ꈊ ᵕ｡꒱ \n`+
-                `    𝙷𝚒𝚒 ${username}~! 𝙸'𝚖 𝙲𝚘𝚛𝚗𝚎𝚕𝚒𝚊-𝚌𝚑𝚊𝚗 💮!! 𝙰𝚜𝚔 𝚖𝚎 𝚊𝚗𝚢𝚝𝚑𝚒𝚗𝚐 𝚗𝚢𝚊~ ✏️\n`+
+                `    𝙷𝚒𝚒 ${styledName}~! 𝙸'𝚖 𝙲𝚘𝚛𝚗𝚎𝚕𝚒𝚊-𝚌𝚑𝚊𝚗 💮!! 𝙰𝚜𝚔 𝚖𝚎 𝚊𝚗𝚢𝚝𝚑𝚒𝚗𝚐 𝚗𝚢𝚊~ ✏️\n`+
                 `˚₊· ͟͟͞͞➳❥ 𝑾𝒊𝒕𝒉 𝒍𝒐𝒗𝒆, 𝑪𝒐𝒓𝒏𝒆𝒍𝒊𝒂\n`+
                 `━━━━━✿━━━━━`;
         } else {
@@ -90,7 +109,7 @@ module.exports = {
                 `✦ ♡༶ᏟᎾᎡᏁᎬᏞᎥᎯ༶♡『⛧』❖\n`+
                 `              ૮₍｡• ˕ •｡₎ა\n`+
                 `╭━━━━⊹⊱✹⊰⊹━━━━╮\n`+
-                `˚₊· ͟͟͞͞➳❥ | ${aiResponse.response}\n`+
+                `˚₊· ͟͟͞͞➳❥ | ${toMonospace(aiResponse.response)}\n`+
                 `╰━━━━⊹⊱✹⊰⊹━━━━╯\n`+
                 `🦋✨ 𝒜𝓃𝓈𝓌𝑒𝓇 𝓌𝒾𝓉𝒽 𝓁𝒾𝑔𝒽𝓉... ⛩️`;
         }
