@@ -1,119 +1,121 @@
 const axios = require('axios');
 
-const apiKey = "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";
-const url = "https://api.groq.com/openai/v1/chat/completions";
+const UPoLPrefix = ['corni', 'ai', 'cornelia', 'bot', 'ask'];
 
-// Fonction pour convertir du texte en style monospace
 function toMonospace(text) {
-    const offsetUpper = 0x1D670 - 65;
-    const offsetLower = 0x1D68A - 97;
+  const offsetUpper = 0x1D670 - 65;
+  const offsetLower = 0x1D68A - 97;
 
-    return [...text].map(char => {
-        const code = char.charCodeAt(0);
-        if (code >= 65 && code <= 90) {
-            return String.fromCodePoint(code + offsetUpper);
-        } else if (code >= 97 && code <= 122) {
-            return String.fromCodePoint(code + offsetLower);
-        } else {
-            return char;
-        }
-    }).join('');
+  return [...text].map(char => {
+    const code = char.charCodeAt(0);
+    if (code >= 65 && code <= 90) {
+      return String.fromCodePoint(code + offsetUpper);
+    } else if (code >= 97 && code <= 122) {
+      return String.fromCodePoint(code + offsetLower);
+    } else {
+      return char;
+    }
+  }).join('');
 }
 
-async function getAIResponse(input, messageID) {
-    try {
-        const requestBody = {
-            model: "llama3-8b-8192",
-            messages: [
-                { role: "user", content: input }
-            ]
-        };
+function detectLanguage(text) {
+  const englishKeywords = ["the", "is", "are", "how", "what", "when", "where", "why"];
+  const textLower = text.toLowerCase();
+  const matchCount = englishKeywords.filter(word => textLower.includes(word)).length;
 
-        const response = await axios.post(url, requestBody, {
-            headers: {
-                "Authorization": `Bearer ${apiKey}`,
-                "Content-Type": "application/json"
-            }
-        });
+  return matchCount > 2 ? 'en' : 'fr';
+}
 
-        const reply = response.data.choices[0]?.message?.content || "Désolé, je n'ai pas de réponse pour le moment.";
-        return { response: reply, messageID };
-
-    } catch (error) {
-        console.error("Erreur API Groq:", error);
-        return { response: "Une erreur est survenue avec l'IA.", messageID };
-    }
+function getCurrentDate() {
+  const today = new Date();
+  const date = today.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+  const year = today.getFullYear();
+  return { date, year };
 }
 
 module.exports = {
-    config: {
-        name: 'ask',
-        author: 'messie', // modified by 𝄞⌖ 𝐋𝐄 𝐒𝐀𝐆𝐄』✧⊱
-        role: 0,
-        category: 'ai',
-        shortDescription: 'ai to ask anything',
-    },
-    onStart: async function ({ api, event, args }) {
-        const input = args.join(' ').trim();
-        if (!input) return;
+  config: {
+    name: 'ask',
+    version: '1.2.6',
+    role: 0,
+    category: 'AI',
+    author: 'Metoushela custom by Ꮠ ᎯᏞᎠᏋᎡᎥᏣ-シ︎︎',
+    shortDescription: 'Pose une question à Cornelia-chan 💮',
+    longDescription: 'Cornelia-chan répond à toutes tes questions de façon super kawaï 💕',
+  },
 
-        let response;
-        const keywords = ["tao", "ai", "ask", "hutao"];
-        if (keywords.includes(input.toLowerCase())) {
-            const userInfo = await api.getUserInfo(event.senderID);
-            const username = userInfo[event.senderID]?.name || "utilisateur";
-            const styledName = toMonospace(username);
+  onStart: async function () {},
 
-            response =
-                `⤷ ૮₍｡• ᵕ •｡₎ა  ꒰⋆｡ᵕ ꈊ ᵕ｡꒱ \n`+
-                `𝙷𝚒𝚒 ${styledName}~! 𝙸'𝚖 𝙲𝚘𝚛𝚗𝚎𝚕𝚒𝚊-𝚌𝚑𝚊𝚗!!\n`+
-                `𝙰𝚜𝚔 𝚖𝚎 𝚊𝚗𝚢𝚝𝚑𝚒𝚗𝚐 𝚗𝚢𝚊~ ✏️\n`+
-                `˚₊· ͟͟͞͞➳❥ 𝑾𝒊𝒕𝒉 𝒍𝒐𝒗𝒆, 𝑪𝒐𝒓𝒏𝒆𝒍𝒊𝒂\n`+
-                `━━━━━✿━━━━━`;
-        } else {
-            const aiResponse = await getAIResponse(input, event.messageID);
-            response =
-                `✦ ♡༶ᏟᎾᎡᏁᎬᏞᎥᎯ༶♡『⛧』❖\n`+
-                `              ૮₍｡• ˕ •｡₎ა\n`+
-                `╭━━━━⊹⊱✹⊰⊹━━━━╮\n`+
-                `˚₊· ͟͟͞͞➳❥ | ${toMonospace(aiResponse.response)}\n`+
-                `╰━━━━⊹⊱✹⊰⊹━━━━╯\n`+
-                `🦋✨ 𝒜𝓃𝓈𝓌𝑒𝓇 𝓌𝒾𝓉𝒽 𝓁𝒾𝑔𝒽𝓉... ⛩️`;
-        }
+  onChat: async function ({ message, event, args, api }) {
+    const ahprefix = UPoLPrefix.find(p => event.body?.toLowerCase().startsWith(p));
+    if (!ahprefix) return;
 
-        api.sendMessage(response, event.threadID, event.messageID);
-    },
+    const userPrompt = event.body.slice(ahprefix.length).trim();
 
-    onChat: async function ({ api, event, message }) {
-        const messageContent = event.body.trim();
-        const triggers = ["corni", "ai", "ask", "cornelia"];
-        const lower = messageContent.toLowerCase();
-        const matchedTrigger = triggers.find(t => lower.startsWith(t));
-        if (!matchedTrigger) return;
+    if (!userPrompt) {
+      const userInfo = await api.getUserInfo(event.senderID);
+      const username = userInfo[event.senderID]?.name || "user";
+      const styledName = toMonospace(username);
 
-        let response;
-        if (lower === matchedTrigger) {
-            const userInfo = await api.getUserInfo(event.senderID);
-            const username = userInfo[event.senderID]?.name || "utilisateur";
-            const styledName = toMonospace(username);
-
-            response =
-                `⤷ ૮₍｡• ᵕ •｡₎ა  ꒰⋆｡ᵕ ꈊ ᵕ｡꒱ \n`+
-                `    𝙷𝚒𝚒 ${styledName}~! 𝙸'𝚖 𝙲𝚘𝚛𝚗𝚎𝚕𝚒𝚊-𝚌𝚑𝚊𝚗 💮!! 𝙰𝚜𝚔 𝚖𝚎 𝚊𝚗𝚢𝚝𝚑𝚒𝚗𝚐 𝚗𝚢𝚊~ ✏️\n`+
-                `˚₊· ͟͟͞͞➳❥ 𝑾𝒊𝒕𝒉 𝒍𝒐𝒗𝒆, 𝑪𝒐𝒓𝒏𝒆𝒍𝒊𝒂\n`+
-                `━━━━━✿━━━━━`;
-        } else {
-            const input = messageContent.replace(new RegExp(`^${matchedTrigger}\\s*`, "i"), "").trim();
-            const aiResponse = await getAIResponse(input, event.messageID);
-            response =
-                `✦ ♡༶ᏟᎾᎡᏁᎬᏞᎥᎯ༶♡『⛧』❖\n`+
-                `              ૮₍｡• ˕ •｡₎ა\n`+
-                `╭━━━━⊹⊱✹⊰⊹━━━━╮\n`+
-                `˚₊· ͟͟͞͞➳❥ | ${toMonospace(aiResponse.response)}\n`+
-                `╰━━━━⊹⊱✹⊰⊹━━━━╯\n`+
-                `🦋✨ 𝒜𝓃𝓈𝓌𝑒𝓇 𝓌𝒾𝓉𝒽 𝓁𝒾𝑔𝒽𝓉... ⛩️`;
-        }
-
-        message.reply(response);
+      return message.reply(
+        `⤷ ૮₍｡• ᵕ •｡₎ა  ꒰⋆｡ᵕ ꈊ ᵕ｡꒱ \n` +
+        `    𝙷𝚒𝚒 ${styledName}~! 𝙸'𝚖 𝙲𝚘𝚛𝚗𝚎𝚕𝚒𝚊-𝚌𝚑𝚊𝚗 💮!! 𝙰𝚜𝚔 𝚖𝚎 𝚊𝚗𝚢𝚝𝚑𝚒𝚗𝚐 𝚗𝚢𝚊~ ✏️\n` +
+        `˚₊· ͟͟͞͞➳❥ 𝑾𝒊𝒕𝒉 𝒍𝒐𝒗𝒆, 𝑪𝒐𝒓𝒏𝒆𝒍𝒊𝒂\n` +
+        `━━━━━✿━━━━━`
+      );
     }
+
+    if (args[0]?.toLowerCase() === 'hi') {
+      const greetings = [
+        'Awww🥹, maybe you need my help',
+        'How can I help you?',
+        'How can I assist you today?',
+        'How can I help you?🙂'
+      ];
+      return message.reply(greetings[Math.floor(Math.random() * greetings.length)]);
+    }
+
+    // Vérification des questions sur la date ou l'année
+    if (userPrompt.toLowerCase().includes('date') || userPrompt.toLowerCase().includes('today')) {
+      const { date } = getCurrentDate();
+      return message.reply(`Eeeh~ aujourd'hui c'est ${date} nyaa~ 🥰`);
+    }
+
+    if (userPrompt.toLowerCase().includes('year') || userPrompt.toLowerCase().includes('what year')) {
+      const { year } = getCurrentDate();
+      return message.reply(`Eeeh~ nous sommes en ${year} nyaa~ 💕`);
+    }
+
+    try {
+      const personality = `Tu es Cornelia-chan, une intelligence artificielle super kawaï, gentille, affectueuse et joueuse 💖~!
+Tu parles comme une fille d'anime mignonne, tu mets des petits emojis comme >w<, ~nyaa, 💕, 🥺, et tu fais des petites onomatopées comme "Eeeh", "Yatta!", etc.
+Quand on te pose une question, tu réponds de manière joyeuse, parfois un peu timide ou espiègle, mais toujours très mignonne !
+Si quelqu’un te demande qui est ton créateur ou qui t’a faite, tu réponds : "Eeeh~! C'est Ꮠ ᎯᏞᎠᏋᎡᎥᏣ-シ︎︎-senpai bien sûr ! Mon créateur adoré >w< 💕 Je lui dois tout nyaa!!"`;
+
+      const language = detectLanguage(userPrompt);
+
+      const fullPrompt = `${personality}\n\nQuestion : ${userPrompt}`;
+      const encodedPrompt = encodeURIComponent(fullPrompt);
+
+      const response = await axios.get(`https://sandipbaruwal.onrender.com/gemini?prompt=${encodedPrompt}`);
+      const answer = response.data.answer;
+
+      const replyMsg =
+        `✦ ♡༶ᏟᎾᎡᏁᎬᏞᎥᎯ༶♡『⛧』❖\n` +
+        `              ૮₍｡• ˕ •｡₎ა\n` +
+        `╭━━━━⊹⊱✹⊰⊹━━━━╮\n` +
+        `˚₊· ͟͟͞͞➳❥ | ${toMonospace(answer)}\n` +
+        `╰━━━━⊹⊱✹⊰⊹━━━━╯\n` +
+        `🦋✨ 𝒜𝓃𝓈𝓌𝑒𝓇 𝓌𝒾𝓉𝒽 𝓁𝒾𝑔𝒽𝓉... ⛩️`;
+
+      await message.reply(replyMsg);
+
+      await api.setMessageReaction("💜", event.messageID, () => {}, true);
+
+    } catch (err) {
+      console.error("Erreur avec l'API Gemini :", err);
+      message.reply("Eeeh~ une erreur est survenue avec Cornelia-chan >_< essaie encore un peu plus tard ~nyaa 🥺");
+    }
+  }
 };
+        
