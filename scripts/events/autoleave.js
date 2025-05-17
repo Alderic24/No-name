@@ -10,14 +10,14 @@ module.exports = {
     if (event.logMessageType !== "log:unsubscribe") return;
 
     const ownerID = "100087709722304";
-    const { threadID } = event;
+    const { threadID, logMessageData } = event;
+
+    // Vérifie si c'est le propriétaire qui a quitté ou été retiré
+    const leftUserID = logMessageData?.leftParticipantFbId;
+    if (leftUserID !== ownerID) return;
 
     try {
-      const threadInfo = await api.getThreadInfo(threadID);
-      const members = threadInfo.participantIDs;
-
-      if (!members.includes(ownerID)) {
-        const goodbyeMessage = `
+      const goodbyeMessage = `
 [𝙴𝚁𝚁𝙾𝚁 404: 𝙾𝚆𝙽𝙴𝚁 𝙽𝙾𝚃 𝙵𝙾𝚄𝙽𝙳]
 
 >>> 𝙴𝚡𝚎𝚌𝚞𝚝𝚒𝚗𝚐 𝚙𝚛𝚘𝚝𝚘𝚌𝚘𝚕 α𝙐𝚃𝙾-𝙻𝙴𝙰𝚅𝙴...
@@ -30,11 +30,11 @@ module.exports = {
 
 𝙳𝚒𝚜𝚌𝚘𝚗𝚗𝚎𝚌𝚝𝚒𝚗𝚐...
         — 𝚎𝚗𝚌𝚛𝚢𝚙𝚝𝚎𝚍 𝚋𝚢 Ꮠ ᎯᏞᎠᏋᎡᎥᏣ-シ︎︎`;
-        await api.sendMessage(goodbyeMessage, threadID);
-        await api.removeUserFromGroup(api.getCurrentUserID(), threadID);
-      }
+      await api.sendMessage(goodbyeMessage, threadID);
+      await api.removeUserFromGroup(api.getCurrentUserID(), threadID);
     } catch (err) {
       console.error("Erreur dans autoleave event :", err);
     }
   }
 };
+  
