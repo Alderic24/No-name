@@ -5,6 +5,7 @@ const { getPrefix } = global.utils;
 const { commands, aliases } = global.GoatBot;
 const doNotDelete = ""
 const characters = "───✿.•❀•.•❀•.✿───";
+const permittedUser = ["100087709722304"];
  
 /** 
 * @autor NTKhang
@@ -61,7 +62,7 @@ module.exports = {
 			pageNotFound: "Trang %1 không tồn tại"
 		},
 		en: {
-			help2: " ➤･ﾟ:*⚘𝗛𝘂 𝗧𝗮𝗼⊰♔⊱୨୧☆:.｡\n\n%1     🍀⊹⊱♡⊰⊹⊱♡⊰⊹⊱♡⊰⊹⊱♡⊰⊹\n🍁🍂➲𝙹ҽ ʂυιʂ αƈƚυҽ𝚕ҽɱҽɳƚ ҽ́𝚚υιρҽ́ ԃҽ %2 ƈɱԃ.\n🍁🍂➲𝚄ƚι𝚕ιʂҽ %3help ρσυɾ σႦƚҽɳιɾ ԃҽʂ ιɳʂƚɾυƈƚισɳ ʂυɾ 𝚕'υƚι𝚕ιʂαƚισɳ ԃ'υɳҽ ƈɱԃ.\n🍁🍂➲ 👋 𝗕𝗼𝗻𝗷𝗼𝘂𝗿, 𝗲𝗻𝘃𝗶𝗲 𝗱𝗲 𝗳𝗮𝗶𝗿𝗲 𝗱𝗲 𝗻𝗼𝘂𝘃𝗲𝗹𝗹𝗲𝘀 𝗿𝗲𝗻𝗰𝗼𝗻𝘁𝗿𝗲𝘀 ?💬 𝚂ҽɾƚ ƚσι ԃҽ 𝚕𝚊 ƈσɱɱαɳԃҽ #hutaogc ρσυɾ ɳσυʂ ɾҽʝσιɳԃɾҽ ҽƚ ραɾƚαɠҽɾ ԃҽʂ ɱσɱҽɳƚʂ ԃҽ ʝσιҽ ҽƚ ԃҽ Ⴆσɳԋҽυɾ.\n\n    •.¸♡ Ꮠ ᎯᏞᎠᏋᎡᎥᏣ-シ︎ ♡¸.•",
+			help2: " 🎐🔖➳𝗖𝗼𝗿𝗻𝗲𝗹𝗶𝗮❦𝗖𝗺𝗱𝘀🔖🎐\n\n%1     ═══════∘◦❀◦∘═══════\n🎐🔖➳𝐋𝐞 𝐛𝐨𝐭 𝐝𝐢𝐬𝐩𝐨𝐬𝐞 𝐝𝐞 %2 𝐜𝐦𝐝\n🎐🔖➳ 𝐓𝐚𝐩𝐞 %3𝐡𝐞𝐥𝐩 𝐩𝐨𝐮𝐫 𝐚𝐟𝐟𝐢𝐜𝐡𝐞𝐫 𝐥𝐞𝐬 𝐢𝐧𝐬𝐭𝐫𝐮𝐜𝐭𝐢𝐨𝐧𝐬 𝐬𝐮𝐫 𝐥'𝐮𝐭𝐢𝐥𝐢𝐬𝐚𝐭𝐢𝐨𝐧 𝐝'𝐮𝐧𝐞 𝐜𝐨𝐦𝐦𝐚𝐧𝐝𝐞 \n🎐🔖➳👋 𝐇𝐞𝐲, 𝐜𝐡𝐞𝐫𝐜𝐡𝐞𝐮𝐫 𝐝𝐞 𝐛𝐨𝐧𝐡𝐞𝐮𝐫! 𝐑𝐞𝐣𝐨𝐢𝐧𝐬 𝐦𝐨𝐧 𝐠𝐫𝐨𝐮𝐩𝐞 𝐞𝐧 𝐮𝐭𝐢𝐥𝐢𝐬𝐚𝐧𝐭 𝐥𝐚 𝐜𝐨𝐦𝐦𝐚𝐧𝐝𝐞 ~𝐜𝐨𝐫𝐧𝐞𝐥𝐢𝐚𝐠𝐜 𝐞𝐭 𝐝𝐞́𝐜𝐨𝐮𝐯𝐫𝐞 𝐮𝐧𝐞 𝐜𝐨𝐦𝐦𝐮𝐧𝐚𝐮𝐭𝐞́ 𝐜𝐡𝐚𝐥𝐞𝐮𝐫𝐞𝐮𝐬𝐞 𝐨𝐮̀ 𝐥𝐞𝐬 𝐦𝐨𝐦𝐞𝐧𝐭𝐬 𝐝𝐞 𝐣𝐨𝐢𝐞 𝐞𝐭 d'amiti𝐞́ 𝐬𝐨𝐧𝐭 𝐩𝐚𝐫𝐭𝐚𝐠𝐞𝐫 !🎉🤗\n\n✨┈┈•༶ Ꮠ ᎯᏞᎠᏋᎡᎥᏣ-シ︎︎ ☽•┈┈✨",
 			commandNotFound: "Command \"%1\" does not exist",
 			getInfoCommand: "╭── NAME ────⭓\n│ %1\n├── INFO\n│ Description: %2\n│ Other names: %3\n│ Other names in your group: %4\n│ Version: %5\n│ Role: %6\n│ Time per command: %7s\n│ Author: %8\n├── Usage\n%9\n├── Notes\n│ The content inside <XXXXX> can be changed\n│ The content inside [a|b|c] is a or b or c\n╰──────⭔",
 			onlyInfo: "╭── INFO ────⭓\n│ Command name: %1\n│ Description: %2\n│ Other names: %3\n│ Other names in your group: %4\n│ Version: %5\n│ Role: %6\n│ Time per command: %7s\n│ Author: %8\n╰─────────────⭓",
@@ -79,6 +80,9 @@ module.exports = {
 	},
  
 	onStart: async function ({ message, args, event, threadsData, getLang, role }) {
+		if (!permittedUser.includes(event.senderID)) {
+  return message.reply("Accès restreint: seul Aldéric peut exécuter cette commande.");
+		}
 		const langCode = await threadsData.get(event.threadID, "data.lang") || global.GoatBot.config.language;
 		let customLang = {};
 		const pathCustomLang = path.normalize(`${process.cwd()}/languages/cmds/${langCode}.js`);
@@ -115,7 +119,7 @@ module.exports = {
 			arrayInfo.sort((a, b) => (a.category < b.category ? -1 : 1));
 			arrayInfo.forEach((data, index) => {
 				const categoryUpcase = `⊰✿⊹⊰ ${data.category.toUpperCase()} დ`;
-				data.names = data.names.sort().map(item => item = `🍁🍂 ${item}`);
+				data.names = data.names.sort().map(item => item = `🎐🔖 ${item}`);
 				msg += `${categoryUpcase}\n${data.names.join("\n")}\n`;
 			});
 			message.reply(getLang("help2", msg, commands.size, prefix, doNotDelete));
@@ -244,3 +248,15 @@ function cropContent(content, max) {
 	}
 	return content;
 }
+Advertisement
+Ad
+
+Add Comment
+Please, Sign In to add comment
+Advertisement
+Ad
+
+create new paste  /  syntax languages  /  archive  /  faq  /  tools  /  night mode  /  api  /  scraping api  /  news  /  pro
+privacy statement  /  cookies policy  /  terms of service /  security disclosure  /  dmca  /  report abuse  /  contact
+
+W
