@@ -39,7 +39,7 @@ module.exports = {
     version: '1.2.6',
     role: 0,
     category: 'AI',
-    author: 'Metoushela custom by Ꮠ ᎯᏞᎠᏋᎡᎥᏣ-シ︎︎',
+    author: 'Metoushela improved by Ꮠ ᎯᏞᎠᏋᎡᎥᏣ-シ︎︎',
     shortDescription: 'Pose une question à Cornelia-chan 💮',
     longDescription: 'Cornelia-chan répond à toutes tes questions de façon super kawaï 💕',
   },
@@ -47,75 +47,78 @@ module.exports = {
   onStart: async function () {},
 
   onChat: async function ({ message, event, args, api }) {
-    const ahprefix = UPoLPrefix.find(p => event.body?.toLowerCase().startsWith(p));
-    if (!ahprefix) return;
+  const isReplyToBot = event.messageReply?.senderID === api.getCurrentUserID();
+  const ahprefix = UPoLPrefix.find(p => event.body?.toLowerCase().startsWith(p));
 
-    const userPrompt = event.body.slice(ahprefix.length).trim();
+  let userPrompt = null;
 
-    if (!userPrompt) {
-      const userInfo = await api.getUserInfo(event.senderID);
-      const username = userInfo[event.senderID]?.name || "user";
-      const styledName = toMonospace(username);
+  if (ahprefix) {
+    userPrompt = event.body.slice(ahprefix.length).trim();
+  } else if (isReplyToBot && event.body) {
+    userPrompt = event.body.trim();
+  } else {
+    return; // Ni préfixe ni reply = on ignore
+  }
 
-      return message.reply(
-        `⤷ ૮₍｡• ᵕ •｡₎ა  ꒰⋆｡ᵕ ꈊ ᵕ｡꒱ \n` +
-        `    𝙷𝚒𝚒 ${styledName}~! 𝙸'𝚖 𝙲𝚘𝚛𝚗𝚎𝚕𝚒𝚊-𝚌𝚑𝚊𝚗 💮!! 𝙰𝚜𝚔 𝚖𝚎 𝚊𝚗𝚢𝚝𝚑𝚒𝚗𝚐 𝚗𝚢𝚊~ ✏️\n` +
-        `˚₊· ͟͟͞͞➳❥ 𝑾𝒊𝒕𝒉 𝒍𝒐𝒗𝒆, 𝑪𝒐𝒓𝒏𝒆𝒍𝒊𝒂\n` +
-        `━━━━━✿━━━━━`
-      );
-    }
+  if (!userPrompt) {
+    const userInfo = await api.getUserInfo(event.senderID);
+    const username = userInfo[event.senderID]?.name || "user";
+    const styledName = toMonospace(username);
 
-    if (args[0]?.toLowerCase() === 'hi') {
-      const greetings = [
-        'Awww🥹, maybe you need my help',
-        'How can I help you?',
-        'How can I assist you today?',
-        'How can I help you?🙂'
-      ];
-      return message.reply(greetings[Math.floor(Math.random() * greetings.length)]);
-    }
+    return message.reply(
+      `⤷ ૮₍｡• ᵕ •｡₎ა  ꒰⋆｡ᵕ ꈊ ᵕ｡꒱ \n` +
+      `    𝙷𝚒𝚒 ${styledName}~! 𝙸'𝚖 𝙲𝚘𝚛𝚗𝚎𝚕𝚒𝚊-𝚌𝚑𝚊𝚗 💮!! 𝙰𝚜𝚔 𝚖𝚎 𝚊𝚗𝚢𝚝𝚑𝚒𝚗𝚐 𝚗𝚢𝚊~ ✏️\n` +
+      `˚₊· ͟͟͞͞➳❥ 𝑾𝒊𝒕𝒉 𝒍𝒐𝒗𝒆, 𝑪𝒐𝒓𝒏𝒆𝒍𝒊𝒂\n` +
+      `━━━━━✿━━━━━`
+    );
+  }
 
-    // Vérification des questions sur la date ou l'année
-    if (userPrompt.toLowerCase().includes('date') || userPrompt.toLowerCase().includes('today')) {
-      const { date } = getCurrentDate();
-      return message.reply(`Eeeh~ aujourd'hui c'est ${date} nyaa~ 🥰`);
-    }
+  if (args[0]?.toLowerCase() === 'hi') {
+    const greetings = [
+      'Awww🥹, maybe you need my help',
+      'How can I help you?',
+      'How can I assist you today?',
+      'How can I help you?🙂'
+    ];
+    return message.reply(greetings[Math.floor(Math.random() * greetings.length)]);
+  }
 
-    if (userPrompt.toLowerCase().includes('year') || userPrompt.toLowerCase().includes('what year')) {
-      const { year } = getCurrentDate();
-      return message.reply(`Eeeh~ nous sommes en ${year} nyaa~ 💕`);
-    }
+  if (userPrompt.toLowerCase().includes('date') || userPrompt.toLowerCase().includes('today')) {
+    const { date } = getCurrentDate();
+    return message.reply(`Eeeh~ aujourd'hui c'est ${date} nyaa~ 🥰`);
+  }
 
-    try {
-      const personality = `Tu es Cornelia-chan, une intelligence artificielle super kawaï, gentille, affectueuse et joueuse 💖~!
+  if (userPrompt.toLowerCase().includes('year') || userPrompt.toLowerCase().includes('what year')) {
+    const { year } = getCurrentDate();
+    return message.reply(`Eeeh~ nous sommes en ${year} nyaa~ 💕`);
+  }
+
+  try {
+    const personality = `Tu es Cornelia-chan, une intelligence artificielle super kawaï, gentille, affectueuse et joueuse 💖~!
 Tu parles comme une fille d'anime mignonne, tu mets des petits emojis comme >w<, ~nyaa, 💕, 🥺, et tu fais des petites onomatopées comme "Eeeh", "Yatta!", etc.
 Quand on te pose une question, tu réponds de manière joyeuse, parfois un peu timide ou espiègle, mais toujours très mignonne !
 Si quelqu’un te demande qui est ton créateur ou qui t’a faite, tu réponds : "Eeeh~! C'est Ꮠ ᎯᏞᎠᏋᎡᎥᏣ-シ︎︎-senpai bien sûr ! Mon créateur adoré >w< 💕 Je lui dois tout nyaa!!"`;
 
-      const language = detectLanguage(userPrompt);
+    const language = detectLanguage(userPrompt);
+    const fullPrompt = `${personality}\n\nQuestion : ${userPrompt}`;
+    const encodedPrompt = encodeURIComponent(fullPrompt);
 
-      const fullPrompt = `${personality}\n\nQuestion : ${userPrompt}`;
-      const encodedPrompt = encodeURIComponent(fullPrompt);
+    const response = await axios.get(`https://sandipbaruwal.onrender.com/gemini?prompt=${encodedPrompt}`);
+    const answer = response.data.answer;
 
-      const response = await axios.get(`https://sandipbaruwal.onrender.com/gemini?prompt=${encodedPrompt}`);
-      const answer = response.data.answer;
+    const replyMsg =
+      `✦ ♡༶ᏟᎾᎡᏁᎬᏞᎥᎯ༶♡『⛧』❖\n` +
+      `              ૮₍｡• ˕ •｡₎ა\n` +
+      `╭━━━━⊹⊱✹⊰⊹━━━━╮\n` +
+      `˚₊· ͟͟͞͞➳❥ | ${toMonospace(answer)}\n` +
+      `╰━━━━⊹⊱✹⊰⊹━━━━╯\n` +
+      `🦋✨ 𝙻𝖆 𝖘𝖚𝖎𝖙𝖊 𝖙’𝖎𝖓𝖙𝖗𝖎𝖌𝖚𝖊 ? 𝕽é𝖕𝖔𝖓𝖉𝖘-𝖒𝖔𝖎, 𝖊𝖙 𝖔𝖓 𝖈𝖔𝖓𝖙𝖎𝖓𝖚𝖊.... ⛩️`;
 
-      const replyMsg =
-        `✦ ♡༶ᏟᎾᎡᏁᎬᏞᎥᎯ༶♡『⛧』❖\n` +
-        `              ૮₍｡• ˕ •｡₎ა\n` +
-        `╭━━━━⊹⊱✹⊰⊹━━━━╮\n` +
-        `˚₊· ͟͟͞͞➳❥ | ${toMonospace(answer)}\n` +
-        `╰━━━━⊹⊱✹⊰⊹━━━━╯\n` +
-        `🦋✨ 𝒜𝓃𝓈𝓌𝑒𝓇 𝓌𝒾𝓉𝒽 𝓁𝒾𝑔𝒽𝓉... ⛩️`;
-
-      await message.reply(replyMsg);
-
-      await api.setMessageReaction("💜", event.messageID, () => {}, true);
-
-    } catch (err) {
-      console.error("Erreur avec l'API Gemini :", err);
-      message.reply("Eeeh~ une erreur est survenue avec Cornelia-chan >_< essaie encore un peu plus tard ~nyaa 🥺");
-    }
+    await message.reply(replyMsg);
+    await api.setMessageReaction("💜", event.messageID, () => {}, true);
+  } catch (err) {
+    console.error("Erreur avec l'API Gemini :", err);
+    message.reply("Eeeh~ une erreur est survenue avec Cornelia-chan >_< essaie encore un peu plus tard ~nyaa 🥺");
   }
+}
 };
-        
