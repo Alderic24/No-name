@@ -1,0 +1,64 @@
+const fs = require('fs');
+const path = require('path');
+
+function formatLeaderboard(data) {
+  const levels = [
+    { key: 'easy', emoji: '🟢', color: '💚', title: '𝑬𝒂𝒔𝒚' },
+    { key: 'medium', emoji: '🟡', color: '💛', title: '𝑴𝒆𝒅𝒊𝒖𝒎' },
+    { key: 'hard', emoji: '🔴', color: '❤️', title: '𝑯𝒂𝒓𝒅' }
+  ];
+
+  let message = `🎮 𝙃𝙖𝙣𝙜𝙢𝙖𝙣 – ✨ 𝓒𝓵𝓪𝓼𝓼𝓮𝓶𝓮𝓷𝓽 𝓹𝓪𝓻 𝓭𝓲𝓯𝓯𝓲𝓬𝓾𝓵𝓽é ✨\n\n`;
+
+  for (const level of levels) {
+    message += `${level.emoji} ${level.title} 〜✿〜\n`;
+    message += `────────────────────────\n`;
+
+    if (!data[level.key] || data[level.key].length === 0) {
+      message += `Aucun joueur pour ce niveau...\n\n`;
+      continue;
+    }
+
+    const sorted = data[level.key].sort((a, b) => b.wins - a.wins);
+
+    for (let i = 0; i < Math.min(3, sorted.length); i++) {
+      const rankEmoji = i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉';
+      const player = sorted[i];
+      message += `${rankEmoji} ${player.name.padEnd(10, ' ')} ┆ ${player.wins} victoires ${level.color}\n`;
+    }
+
+    message += `\n`;
+  }
+
+  message += `➳ Tape ~hangman stats pour voir tes propres victoires ! ٩(◕‿◕)۶`;
+  return message;
+}
+
+module.exports = {
+  config: {
+    name: 'hangmantop',
+    version: '1.0.1',
+    role: 0,
+    category: 'game',
+    shortDescription: 'Classement par difficulté du jeu du pendu',
+    author: 'Ꮠ ᎯᏞᎠᏋᎡᎥᏣ-シ︎︎'
+  },
+
+  onChat: async function ({ message }) {
+    try {
+      const filePath = path.resolve(__dirname, 'hangmanData.json');
+      if (!fs.existsSync(filePath)) {
+        return message.reply("📛 Aucune donnée de classement trouvée.");
+      }
+
+      const rawData = fs.readFileSync(filePath, 'utf8');
+      const hangmanData = JSON.parse(rawData);
+
+      const leaderboardMessage = formatLeaderboard(hangmanData);
+      return message.reply(leaderboardMessage);
+    } catch (error) {
+      console.error('Erreur lors de la lecture du classement :', error);
+      return message.reply("❌ Une erreur est survenue lors de la récupération du classement.");
+    }
+  }
+};
