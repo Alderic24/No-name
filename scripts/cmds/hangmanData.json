@@ -1,0 +1,14 @@
+{
+  "123456789": {
+    "name": "PlayerOne",
+    "easy": 5,
+    "medium": 3,
+    "hard": 1
+  },
+  "987654321": {
+    "name": "PlayerTwo",
+    "easy": 2,
+    "medium": 4,
+    "hard": 0
+  }
+}
