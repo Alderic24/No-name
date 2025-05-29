@@ -8,7 +8,7 @@ function formatLeaderboard(data) {
     { key: 'hard', emoji: '🔴', color: '❤️', title: '𝑯𝒂𝒓𝒅' }
   ];
 
-  let message = `🎮 𝙃𝙖𝙣𝙜𝙢𝙖𝙣 – ✨ 𝓒𝓵𝓪𝓼𝓼𝓮𝓶𝓮𝓷𝓽 𝓹𝓪𝓻 𝓭𝓲𝓯𝓯𝓲𝓬𝓾𝓵𝓽é ✨\n\n`;
+  let message = `🎮 𝙃𝙖𝙣𝙜𝙢𝙖𝙣 – ✨\n\n`;
 
   for (const level of levels) {
     message += `${level.emoji} ${level.title} 〜✿〜\n`;
