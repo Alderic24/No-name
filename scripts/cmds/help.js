@@ -5,7 +5,6 @@ const { getPrefix } = global.utils;
 const { commands, aliases } = global.GoatBot;
 const doNotDelete = ""
 const characters = "───✿.•❀•.•❀•.✿───";
-const permittedUser = ["100087709722304"];
  
 /** 
 * @autor NTKhang
@@ -80,9 +79,6 @@ module.exports = {
 	},
  
 	onStart: async function ({ message, args, event, threadsData, getLang, role }) {
-		if (!permittedUser.includes(event.senderID)) {
-  return message.reply("Accès restreint: seul Aldéric peut exécuter cette commande.");
-		}
 		const langCode = await threadsData.get(event.threadID, "data.lang") || global.GoatBot.config.language;
 		let customLang = {};
 		const pathCustomLang = path.normalize(`${process.cwd()}/languages/cmds/${langCode}.js`);
@@ -248,15 +244,3 @@ function cropContent(content, max) {
 	}
 	return content;
 }
-Advertisement
-Ad
-
-Add Comment
-Please, Sign In to add comment
-Advertisement
-Ad
-
-create new paste  /  syntax languages  /  archive  /  faq  /  tools  /  night mode  /  api  /  scraping api  /  news  /  pro
-privacy statement  /  cookies policy  /  terms of service /  security disclosure  /  dmca  /  report abuse  /  contact
-
-W
